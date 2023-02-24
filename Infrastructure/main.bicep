@@ -38,8 +38,7 @@ module appService 'modules/appService.module.bicep' ={
     appServiceName: nameSuffix
     appInsightsInstrumentationKey: appInsights.outputs.appInsightsInstrumentationKey
     language: language
-    cosmosDBAccountName: mongoCosmosAccount.outputs.cosmosDBAccountNameOutput
-    cosmosDBRG: resourceGroupData.name
+    cosmosDBConnectionString: mongoCosmosAccount.outputs.cosmosDBAccountConnectionStringOutput
   }
 }
 
@@ -90,6 +89,7 @@ module mongoDB 'modules/mongoDB.module.bicep' ={
     cosmosAccountName: mongoCosmosAccount.outputs.cosmosDBAccountNameOutput
   }
 }
+
 
 
 

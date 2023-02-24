@@ -27,7 +27,15 @@ resource cosmosCollection 'Microsoft.DocumentDB/databaseAccounts/mongodbDatabase
   properties: {
     resource: {
       id: mongoCollectionName
-      indexes: []
+      indexes: [
+        {
+          key: {
+            keys: [
+              '_id'
+            ]
+          }
+        }
+      ]
     }
 
     options: {

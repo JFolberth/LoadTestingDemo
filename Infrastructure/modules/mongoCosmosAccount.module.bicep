@@ -23,3 +23,4 @@ resource databaseAccount 'Microsoft.DocumentDB/databaseAccounts@2022-08-15' = {
 }
 
 output cosmosDBAccountNameOutput string = databaseAccount.name
+output cosmosDBAccountConnectionStringOutput string = databaseAccount.listConnectionStrings().connectionStrings[0].connectionString
