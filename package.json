@@ -4,6 +4,7 @@
   "description": "nodejs-webapp",
   "scripts": {
     "start": "node server.js"
+    "build": 
   },
   "author": {
     "name": "microsoft"
