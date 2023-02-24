@@ -1,0 +1,19 @@
+parameters:
+- name: environmentObjects
+  type: object
+  default:
+  - environmentName: 'dev'
+    dependsOn: ''
+    regionAbrvs: ['eus']
+    loadTesting: false
+- name: templateFile
+  type: string
+  default: 'main'
+- name: serviceName
+  type: string
+  default: 'loadtestbicep'
+
+stages:
+- template: stages/nodejs_build_stage.yml@templates
+  parameters:
+    serviceName: ${{ parameters.serviceName }}
