@@ -17,4 +17,4 @@ pool:
   vmImage: 'ubuntu-latest'
 
 stages:
-    - template: loadtesting_template.yml
+    - template: loadtestingdemo_template.yml
