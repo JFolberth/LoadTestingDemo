@@ -2,18 +2,173 @@ parameters:
 - name: environmentObjects
   type: object
   default:
-  - environmentName: 'dev'
-    dependsOn: ''
-    regionAbrvs: ['eus']
-    loadTesting: false
-- name: templateFile
+    - environmentName: 'dev'
+      regionAbrvs: ['eus']
+- name: templateFileName
   type: string
   default: 'main'
+- name: templateDirectory
+  type: string 
+  default: 'Infrastructure'
 - name: serviceName
   type: string
-  default: 'loadtestbicep'
+  default: 'loadtestingdemoJF'
+
+variables:
+  webAppName: 'app-loadtest-dev-eus'
+  serviceConnection: 'AzureDevServiceConnection'
+  azureSubscriptionId: 'b7d58423-b5cf-4fc4-98bb-446c92dc6ec5'
+  loadTestResource: 'lt-test-dev-eus'
+  loadTestResourceGroup: 'rg-test-dev-eus'
+  location: 'EAST US'
+
 
 stages:
-- template: stages/nodejs_build_stage.yml@templates
-  parameters:
-    serviceName: ${{ parameters.serviceName }}
+- stage: Build
+  displayName: Build 
+  jobs:
+  - template: ../jobs/infrastructure_publish_job.yml@templates
+    parameters:
+      targetPath: ${{ parameters.templateDirectory }}
+  - ${{ each environmentObject in parameters.environmentObjects }} :
+    - ${{ each regionAbrv in environmentObject.regionAbrvs }} :
+      - template: ../jobs/bicep_whatif_env_job.yml@templates
+        parameters:
+          environmentName: ${{ environmentObject.environmentName }}
+          templateFileName: ${{ parameters.templateFileName }}
+          templateDirectory: ${{ parameters.templateDirectory }}
+          serviceName: ${{ parameters.serviceName }}
+          regionAbrv: ${{ regionAbrv }}
+  - template: ../jobs/artifact_publish_job.yml@templates
+    parameters:
+      targetPath: 'tests'
+      artifactName: 'tests'
+  - template: ../jobs/zip_publish_job.yml@templates
+    parameters:
+      artifactName: 'code'
+      rootFolderOrFile: '$(System.DefaultWorkingDirectory)/code'
+        
+
+  - job: Build
+    displayName: Build
+    pool:
+      vmImage: windows-latest
+
+    steps:
+
+    - task: ArchiveFiles@2
+      displayName: 'Archive files'
+      inputs:
+        rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
+        includeRootFolder: false
+        archiveType: zip
+        archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+        replaceExistingArchive: true
+
+    - publish: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+      artifact: drop
+
+- stage: Deploy
+  displayName: Deploy 
+  dependsOn: Build
+  condition: succeeded()
+  jobs:
+  - job: Deploy
+    displayName: Deploy
+    pool:
+      vmImage: windows-latest
+    
+    steps:
+    - task: AzureResourceManagerTemplateDeployment@3
+      inputs:
+        deploymentScope: 'Resource Group'
+        azureResourceManagerConnection: $(serviceConnection)
+        subscriptionId: $(azureSubscriptionId)
+        action: 'Create Or Update Resource Group'
+        resourceGroupName: '$(webAppName)-rg'
+        location: $(location)
+        templateLocation: 'Linked artifact'
+        csmFile: '$(System.DefaultWorkingDirectory)/Infrastructure/main.bicep'
+        overrideParameters: '-webAppName $(webAppName) -hostingPlanName $(webAppName)-host -appInsightsLocation "$(location)" -databaseAccountId $(webAppName)db -databaseAccountLocation "$(location)"'
+        deploymentMode: 'Incremental'
+        deploymentOutputs: 'output'
+    
+    - task: PowerShell@2
+      inputs:
+        targetType: 'inline'
+        script: |
+          $deploymentOutput= ConvertFrom-Json '$(output)'
+          $connectionStringValue= $deploymentOutput.azureCosmosDBAccountKeys.value
+          Write-Host "##vso[task.setvariable variable=connectionString;issecret=true;]$connectionStringValue"
+
+    - task: AzureAppServiceSettings@1
+      inputs:
+        azureSubscription: $(serviceConnection)
+        appName: '$(webAppName)'
+        resourceGroupName: '$(webAppName)-rg'
+        appSettings: |
+          [
+             {
+              "name": "CONNECTION_STRING",
+              "value": "$(connectionString)",
+              "slotSetting": false
+             },
+             {
+              "name": "MSDEPLOY_RENAME_LOCKED_FILES",
+              "value": 1,
+              "slotSetting": false
+             },
+             {
+              "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
+              "value": true,
+              "slotSetting": false
+             },
+             {
+              "name": "HEADER_VALUE",
+              "value": "$(mySecret)",
+              "slotSetting": false
+             }   
+          ]
+
+    - task: DownloadPipelineArtifact@2
+      inputs:
+        artifact: drop
+
+    - task: AzureRmWebAppDeployment@4
+      inputs:
+        ConnectionType: 'AzureRM'
+        azureSubscription: $(serviceConnection)
+        appType: 'webApp'
+        WebAppName: $(webAppName)
+        packageForLinux: '$(Pipeline.Workspace)/$(Build.BuildId).zip'
+        ScriptType: 'Inline Script'
+        InlineScript: 'npm install'
+
+- stage: LoadTest
+  displayName: Load Test
+  dependsOn: Deploy
+  condition: succeeded()
+  jobs:
+  - job: LoadTest
+    displayName: Load Test
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+    
+    
+    - task: AzureLoadTest@1
+      inputs:
+        azureSubscription: $(serviceConnection)
+        loadTestConfigFile: 'tests/SampleApp.yaml'
+        resourceGroup: $(loadTestResourceGroup)
+        loadTestResource: $(loadTestResource)
+        env: |
+          [
+            {
+            "name": "webapp",
+            "value": "$(webAppName).azurewebsites.net"
+            }
+          ]
+          
+    - publish: $(System.DefaultWorkingDirectory)/loadTest
+      artifact: results
