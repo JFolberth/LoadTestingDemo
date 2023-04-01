@@ -47,7 +47,7 @@ stages:
 
 
 
-- template: stages/load_test_stage.yml
+- template: stages/load_test_stage.yml@templates
   parameters:
     environmentObjects: ${{ parameters.environmentObjects }}
     loadTestConfigFile: 'tests/SampleApp.yaml'
