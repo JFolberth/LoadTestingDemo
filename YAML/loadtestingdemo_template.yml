@@ -46,19 +46,19 @@ stages:
       serviceName: ${{ parameters.serviceName }}
 
 
-- stage: 
-  - template: stages/load_test_stage.yml
-    parameters:
-      environmentObjects: ${{ parameters.environmentObjects }}
-      loadTestConfigFile: 'tests/SampleApp.yaml'
-      env: |
-          [
-            {
-            "name": "webapp",
-            "value": "$(webAppName).azurewebsites.net"
-            }
-          ]
-      loadTestResourceName: 'lt-test-dev-eus'
-      loadTestResourceGroupName: 'rg-test-dev-eus'
+
+- template: stages/load_test_stage.yml
+  parameters:
+    environmentObjects: ${{ parameters.environmentObjects }}
+    loadTestConfigFile: 'tests/SampleApp.yaml'
+    env: |
+        [
+          {
+          "name": "webapp",
+          "value": "$(webAppName).azurewebsites.net"
+          }
+        ]
+    loadTestResourceName: 'lt-test-dev-eus'
+    loadTestResourceGroupName: 'rg-test-dev-eus'
     
 
