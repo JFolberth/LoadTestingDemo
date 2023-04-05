@@ -39,12 +39,13 @@ stages:
       artifactName: 'code'
       rootFolderOrFile: '$(System.DefaultWorkingDirectory)/code'
 - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main')}}:
-  - template: stages/bicep_deploy_stage.yml@templates
+  - template: stages/bicep_app_deploy_stage.yml@templates
     parameters:
       environmentObjects: ${{ parameters.environmentObjects }}
       templateFileName: ${{ parameters.templateFileName }}
       serviceName: ${{ parameters.serviceName }}
-
+      packageForLinux: '$(Pipeline.Workspace)/code/*.zip'
+      inLineScript: 'npm install'
 
 
 - template: stages/load_test_stage.yml@templates
