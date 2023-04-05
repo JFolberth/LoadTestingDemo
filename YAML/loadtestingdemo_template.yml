@@ -12,7 +12,7 @@ parameters:
   default: 'Infrastructure'
 - name: serviceName
   type: string
-  default: 'loadtestingdemo'
+  default: 'loadtestdemo'
 
 stages:
 - stage: Build
