@@ -60,6 +60,7 @@ stages:
         location: $(location)
         templateLocation: 'Linked artifact'
         csmFile: '$(System.DefaultWorkingDirectory)/Infrastructure/main.bicep'
+        csmParametersFile: '$(System.DefaultWorkingDirectory)/Infrastructure/parameters/parameters.dev.eus.json'
         deploymentMode: 'Incremental'
         deploymentOutputs: 'output'
     
