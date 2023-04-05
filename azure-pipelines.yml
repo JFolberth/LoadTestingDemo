@@ -59,7 +59,7 @@ stages:
         resourceGroupName: '$(webAppName)-rg'
         location: $(location)
         templateLocation: 'Linked artifact'
-        csmFile: '$(System.DefaultWorkingDirectory)/Infrastructgure/main.bicep'
+        csmFile: '$(System.DefaultWorkingDirectory)/Infrastructure/main.bicep'
         overrideParameters: '-webAppName $(webAppName) -hostingPlanName $(webAppName)-host -appInsightsLocation "$(location)" -databaseAccountId $(webAppName)db -databaseAccountLocation "$(location)"'
         deploymentMode: 'Incremental'
         deploymentOutputs: 'output'
