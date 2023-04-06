@@ -61,44 +61,7 @@ stages:
         csmParametersFile: '$(System.DefaultWorkingDirectory)/Infrastructure/parameters/dev.eus.parameters.json'
         deploymentMode: 'Incremental'
         deploymentOutputs: 'output'
-    
-    - task: PowerShell@2
-      inputs:
-        targetType: 'inline'
-        script: |
-          $deploymentOutput= ConvertFrom-Json '$(output)'
-          $connectionStringValue= $deploymentOutput.azureCosmosDBAccountKeys.value
-          Write-Host "##vso[task.setvariable variable=connectionString;issecret=true;]$connectionStringValue"
-
-    - task: AzureAppServiceSettings@1
-      inputs:
-        azureSubscription: $(serviceConnection)
-        appName: '$(webAppName)'
-        resourceGroupName: '$(webAppName)-rg'
-        appSettings: |
-          [
-             {
-              "name": "CONNECTION_STRING",
-              "value": "$(connectionString)",
-              "slotSetting": false
-             },
-             {
-              "name": "MSDEPLOY_RENAME_LOCKED_FILES",
-              "value": 1,
-              "slotSetting": false
-             },
-             {
-              "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
-              "value": true,
-              "slotSetting": false
-             },
-             {
-              "name": "HEADER_VALUE",
-              "value": "$(mySecret)",
-              "slotSetting": false
-             }   
-          ]
-
+        
     - task: DownloadPipelineArtifact@2
       inputs:
         artifact: drop
