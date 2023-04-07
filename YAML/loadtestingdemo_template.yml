@@ -37,7 +37,7 @@ stages:
   - template: jobs/zip_publish_job.yml@templates
     parameters:
       artifactName: 'code'
-      rootFolderOrFile: '$(System.DefaultWorkingDirectory)/code'
+      rootFolderOrFile: '$(System.DefaultWorkingDirectory)/code/'
 - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main')}}:
   - template: stages/bicep_app_deploy_stage.yml@templates
     parameters:
