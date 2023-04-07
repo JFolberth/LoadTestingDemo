@@ -44,7 +44,7 @@ stages:
       environmentObjects: ${{ parameters.environmentObjects }}
       templateFileName: ${{ parameters.templateFileName }}
       serviceName: ${{ parameters.serviceName }}
-      packageForLinux: '$(System.DefaultWorkingDirectory)/code/*.zip'
+      packageForLinux: '$(Pipeline.Workspace)/code/*.zip'
       inLineScript: 'npm install'
 
 
