@@ -33,6 +33,12 @@ resource appService 'Microsoft.Web/sites@2022-03-01' = {
     siteConfig: {
       minTlsVersion: '1.2'
       phpVersion: phpVersion
+      virtualApplications: [
+        {
+          virtualPath: '/'
+          physicalPath: 'site\\wwwroot\\code'
+        }
+      ]
     }
   }
 }
