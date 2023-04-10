@@ -1,0 +1,14 @@
+{
+	"image": "mcr.microsoft.com/devcontainers/javascript-node",
+  
+	"customizations": {
+	  "vscode": {
+		"extensions": [
+			"ms-azuretools.vscode-bicep",
+			"ms-vscode.vscode-node-azure-pack"
+
+		]
+	  }
+	},
+	"forwardPorts": [3000]
+  }
