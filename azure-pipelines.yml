@@ -14,7 +14,7 @@ variables:
   loadTestResource: 'lt-test-dev-eus'
   loadTestResourceGroup: 'rg-test-dev-eus'
   location: 'EAST US'
-
+trigger: none
 
 stages:
 - stage: Build
