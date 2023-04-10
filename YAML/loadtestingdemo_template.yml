@@ -45,7 +45,7 @@ stages:
       templateFileName: ${{ parameters.templateFileName }}
       serviceName: ${{ parameters.serviceName }}
       packageForLinux: '$(Pipeline.Workspace)/code/*.zip'
-      inLineScript: 'npm install'
+      inLineScript: 'npm install --prefix code/ -g'
 
 
 - template: stages/load_test_stage.yml@templates
