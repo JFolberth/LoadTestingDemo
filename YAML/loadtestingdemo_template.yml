@@ -52,6 +52,7 @@ stages:
   parameters:
     environmentObjects: ${{ parameters.environmentObjects }}
     loadTestConfigFile: 'tests/SampleApp.yaml'
+    serviceName: ${{ parameters.serviceName }}
     envJSONObject: '
         [
           {
