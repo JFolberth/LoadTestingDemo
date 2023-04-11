@@ -55,7 +55,7 @@ stages:
         - template: stages/load_test_stage.yml@templates
           parameters:
             environmentName: ${{ environmentObject.environmentName }}
-            regionAbrv: ${{ regionAbrvs }}
+            regionAbrv: ${{ regionAbrv }}
             loadTestConfigFile: 'tests/SampleApp.yaml'
             serviceName: ${{ parameters.serviceName }}
             envJSONObject: '
