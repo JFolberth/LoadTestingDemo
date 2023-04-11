@@ -63,7 +63,7 @@ stages:
                   "value": "$(webAppName).azurewebsites.net"
                   }
                 ]'
-        loadTestResourceName: 'lt-test-dev-eus'
-        loadTestResourceGroupName: 'rg-test-dev-eus'
+            loadTestResourceName: 'lt-test-dev-eus'
+            loadTestResourceGroupName: 'rg-test-dev-eus'
     
 
