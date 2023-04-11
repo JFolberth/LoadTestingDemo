@@ -16,10 +16,13 @@ parameters:
 - name: serviceName
   type: string
   default: 'loadtestbicep'
+variables:
 - name: skipComponentGovernanceDetection
   type: boolean
   default: true
-
+- name: runAzureLoadTest
+  type: boolean
+  default: true
 stages:
 - stage: '${{ parameters.serviceName }}_build'
   jobs:
@@ -51,23 +54,24 @@ stages:
       serviceName: ${{ parameters.serviceName }}
       packageForLinux: '$(Pipeline.Workspace)/code/*.zip'
       inLineScript: 'npm install'
-  - ${{ each environmentObject in parameters.environmentObjects }} :
-    - ${{ if eq(environmentObject.environmentName, 'tst')}}:
-      - ${{ each regionAbrv in environmentObject.regionAbrvs }} :
-        - template: stages/load_test_stage.yml@templates
-          parameters:
-            environmentName: ${{ environmentObject.environmentName }}
-            regionAbrv: ${{ regionAbrv }}
-            loadTestConfigFile: 'tests/SampleApp.yaml'
-            serviceName: ${{ parameters.serviceName }}
-            envJSONObject: '
-                [
-                  {
-                  "name": "webapp",
-                  "value": "$(webAppName).azurewebsites.net"
-                  }
-                ]'
-            loadTestResourceName: 'lt-test-dev-eus'
-            loadTestResourceGroupName: 'rg-test-dev-eus'
+  - ${{ if eq(variables.runAzureLoadTest, 'true') }} :
+    - ${{ each environmentObject in parameters.environmentObjects }} :
+      - ${{ if eq(environmentObject.environmentName, 'tst')}}:
+        - ${{ each regionAbrv in environmentObject.regionAbrvs }} :
+          - template: stages/load_test_stage.yml@templates
+            parameters:
+              environmentName: ${{ environmentObject.environmentName }}
+              regionAbrv: ${{ regionAbrv }}
+              loadTestConfigFile: 'tests/SampleApp.yaml'
+              serviceName: ${{ parameters.serviceName }}
+              envJSONObject: '
+                  [
+                    {
+                    "name": "webapp",
+                    "value": "$(webAppName).azurewebsites.net"
+                    }
+                  ]'
+              loadTestResourceName: 'lt-test-dev-eus'
+              loadTestResourceGroupName: 'rg-test-dev-eus'
     
 
