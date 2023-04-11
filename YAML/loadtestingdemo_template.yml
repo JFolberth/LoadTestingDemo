@@ -16,6 +16,9 @@ parameters:
 - name: serviceName
   type: string
   default: 'loadtestbicep'
+- name: runAzureLoadTest
+  type: boolean
+  default: 'true'
 stages:
 - stage: '${{ parameters.serviceName }}_build'
   jobs:
@@ -47,7 +50,7 @@ stages:
       serviceName: ${{ parameters.serviceName }}
       packageForLinux: '$(Pipeline.Workspace)/code/*.zip'
       inLineScript: 'npm install'
-  - ${{ if eq('$(variables.runAzureLoadTest)', 'true') }} :
+  - ${{ if eq(parameters.runAzureLoadTest, 'true') }} :
     - ${{ each environmentObject in parameters.environmentObjects }} :
       - ${{ if eq(environmentObject.environmentName, 'tst')}}:
         - ${{ each regionAbrv in environmentObject.regionAbrvs }} :
