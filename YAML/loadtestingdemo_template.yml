@@ -19,7 +19,6 @@ parameters:
 
 stages:
 - stage: '${{ parameters.serviceName }}_build'
-  displayName: Build 
   jobs:
   - template: jobs/infrastructure_publish_job.yml@templates
     parameters:
