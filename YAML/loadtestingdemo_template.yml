@@ -16,6 +16,9 @@ parameters:
 - name: serviceName
   type: string
   default: 'loadtestbicep'
+- name: skipComponentGovernanceDetection
+  type: boolean
+  default: true
 
 stages:
 - stage: '${{ parameters.serviceName }}_build'
