@@ -46,19 +46,22 @@ stages:
       serviceName: ${{ parameters.serviceName }}
       packageForLinux: '$(Pipeline.Workspace)/code/*.zip'
       inLineScript: 'npm install'
-  - template: stages/load_test_stage.yml@templates
-    parameters:
-      environmentObjects: ${{ parameters.environmentObjects }}
-      loadTestConfigFile: 'tests/SampleApp.yaml'
-      serviceName: ${{ parameters.serviceName }}
-      envJSONObject: '
-          [
-            {
-            "name": "webapp",
-            "value": "$(webAppName).azurewebsites.net"
-            }
-          ]'
-      loadTestResourceName: 'lt-test-dev-eus'
-      loadTestResourceGroupName: 'rg-test-dev-eus'
+  - ${{ each environmentObject in parameters.environmentObjects }} :
+    - ${{ if eq(environmentObject.environmentName, 'tst')}}:
+      - ${{ each regionAbrv in environmentObject.regionAbrvs }} :
+        - template: stages/load_test_stage.yml@templates
+          parameters:
+            environmentObjects: ${{ parameters.environmentObjects }}
+            loadTestConfigFile: 'tests/SampleApp.yaml'
+            serviceName: ${{ parameters.serviceName }}
+            envJSONObject: '
+                [
+                  {
+                  "name": "webapp",
+                  "value": "$(webAppName).azurewebsites.net"
+                  }
+                ]'
+        loadTestResourceName: 'lt-test-dev-eus'
+        loadTestResourceGroupName: 'rg-test-dev-eus'
     
 
