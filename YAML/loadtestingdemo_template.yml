@@ -51,14 +51,14 @@ stages:
       environmentObjects: ${{ parameters.environmentObjects }}
       loadTestConfigFile: 'tests/SampleApp.yaml'
       serviceName: ${{ parameters.serviceName }}
-    envJSONObject: '
-        [
-          {
-          "name": "webapp",
-          "value": "$(webAppName).azurewebsites.net"
-          }
-        ]'
-    loadTestResourceName: 'lt-test-dev-eus'
-    loadTestResourceGroupName: 'rg-test-dev-eus'
+      envJSONObject: '
+          [
+            {
+            "name": "webapp",
+            "value": "$(webAppName).azurewebsites.net"
+            }
+          ]'
+      loadTestResourceName: 'lt-test-dev-eus'
+      loadTestResourceGroupName: 'rg-test-dev-eus'
     
 
