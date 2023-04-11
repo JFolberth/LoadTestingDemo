@@ -6,6 +6,7 @@ parameters:
       regionAbrvs: ['eus']
     - environmentName: 'tst'
       regionAbrvs: ['eus']
+      dependsOnEnv: 'dev'
 - name: templateFileName
   type: string
   default: 'main'
@@ -17,7 +18,7 @@ parameters:
   default: 'loadtestbicep'
 
 stages:
-- stage: Build
+- stage: '${{ parameters.serviceName }}_build'
   displayName: Build 
   jobs:
   - template: jobs/infrastructure_publish_job.yml@templates
